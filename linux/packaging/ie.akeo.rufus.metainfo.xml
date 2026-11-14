@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>ie.akeo.rufus</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Rufus</name>
+  <summary>The Reliable USB Formatting Utility</summary>
+  <description>
+    <p>Rufus is a utility that helps format and create bootable USB flash drives,
+    from ISO images (Windows, Linux, etc.), compressed disk images, FreeDOS, Syslinux or GRUB.</p>
+  </description>
+  <launchable type="desktop-id">rufus.desktop</launchable>
+  <developer id="ie.akeo">
+    <name>Pete Batard</name>
+  </developer>
+  <url type="homepage">https://rufus.ie</url>
+  <url type="bugtracker">https://github.com/pbatard/rufus/issues</url>
+  <content_rating type="oars-1.1"/>
+  <provides>
+    <binary>rufus</binary>
+  </provides>
+</component>

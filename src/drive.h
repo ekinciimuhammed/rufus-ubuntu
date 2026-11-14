@@ -74,6 +74,7 @@ typedef struct {
 	DISK_EXTENT Extents[8];
 } VOLUME_DISK_EXTENTS_REDEF;
 
+#if !defined(__linux__)	// VDS/COM is Windows only
 #if !defined(__MINGW32__)
 typedef struct _FILE_FS_DEVICE_INFORMATION {
 	DEVICE_TYPE DeviceType;
@@ -320,6 +321,8 @@ interface IVdsAsync {
 #define IVdsAsync_Wait(This,pHrResult,pAsyncOut) (This)->lpVtbl->Wait(This,pHrResult,pAsyncOut)
 #define IVdsAsync_Release(This) (This)->lpVtbl->Release(This)
 #endif
+
+#endif	/* !__linux__ */
 
 /* MinGW is unhappy about accessing partitions beside the first unless we redef */
 typedef struct _DRIVE_LAYOUT_INFORMATION_EX4 {

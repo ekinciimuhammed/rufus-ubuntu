@@ -1,0 +1,39 @@
+.TH RUFUS 1 "November 2026" "Rufus" "User Commands"
+.SH NAME
+rufus \- The Reliable USB Formatting Utility
+.SH SYNOPSIS
+.B rufus
+[\fB\-x\fR] [\fB\-h\fR] [\fB\-f\fR \fIFILESYSTEM\fR] [\fB\-i\fR \fIPATH\fR] [\fB\-l\fR \fILOCALE\fR] [\fB\-w\fR \fITIMEOUT\fR] [\fIIMAGE\fR]
+.SH DESCRIPTION
+Rufus is a utility that helps format and create bootable USB flash drives,
+from ISO images (Windows, Linux, etc.), disk images (including compressed ones),
+FreeDOS, MS-DOS, Syslinux or GRUB. It requires administrative privileges and
+is started through \fBpkexec\fR(1).
+.SH OPTIONS
+.TP
+\fB\-x\fR, \fB\-\-extra\-devs\fR
+List extra devices, such as USB hard drives.
+.TP
+\fB\-i\fR \fIPATH\fR, \fB\-\-iso\fR=\fIPATH\fR
+Select the image pointed by \fIPATH\fR on startup.
+.TP
+\fB\-l\fR \fILOCALE\fR, \fB\-\-locale\fR=\fILOCALE\fR
+Select the locale to use (e.g. tr\-TR).
+.TP
+\fB\-f\fR \fIFILESYSTEM\fR, \fB\-\-filesystem\fR=\fIFILESYSTEM\fR
+Preselect the file system to use.
+.TP
+\fB\-w\fR \fITIMEOUT\fR, \fB\-\-wait\fR=\fITIMEOUT\fR
+Wait \fITIMEOUT\fR tenths of seconds for another instance to exit.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Display the usage.
+.SH FILES
+.TP
+\fI~/.config/rufus/rufus.ini\fR
+User settings.
+.TP
+\fI/var/cache/rufus\fR
+Downloaded (signature verified) bootloader files and the log of the last session.
+.SH SEE ALSO
+https://rufus.ie

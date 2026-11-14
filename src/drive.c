@@ -33,7 +33,9 @@
 #endif
 
 #include "rufus.h"
+#if !defined(__linux__)
 #include "ntdll.h"
+#endif
 #include "missing.h"
 #include "resource.h"
 #include "settings.h"
@@ -90,6 +92,7 @@ uint64_t persistence_size = 0;
  * IOCTL_MOUNTMGR_SET_AUTO_MOUNT on "\\\\.\\MountPointManager".
  * As the latter is MUCH simpler this is what we'll use too
  */
+#if !defined(__linux__)	// Linux version in linux/core/drive_linux.c
 BOOL SetAutoMount(BOOL enable)
 {
 	HANDLE hMountMgr;
@@ -118,6 +121,7 @@ BOOL GetAutoMount(BOOL* enabled)
 	CloseHandle(hMountMgr);
 	return ret;
 }
+#endif	/* !__linux__ */
 
 /*
  * Working with drive indexes quite risky (left unchecked,inadvertently passing 0 as
@@ -135,6 +139,7 @@ BOOL GetAutoMount(BOOL* enabled)
  * Open a drive or volume with optional write and lock access
  * Return INVALID_HANDLE_VALUE (/!\ which is DIFFERENT from NULL /!\) on failure.
  */
+#if !defined(__linux__)	// Linux version in linux/core/drive_linux.c
 static HANDLE GetHandle(char* Path, BOOL bLockDrive, BOOL bWriteAccess, BOOL bWriteShare)
 {
 	int i;
@@ -228,6 +233,9 @@ char* GetPhysicalName(DWORD DriveIndex)
 out:
 	return (success)?safe_strdup(physical_name):NULL;
 }
+#else
+extern HANDLE GetHandle(char* Path, BOOL bLockDrive, BOOL bWriteAccess, BOOL bWriteShare);
+#endif	/* !__linux__ */
 
 /*
  * Return a handle to the physical drive identified by DriveIndex
@@ -247,6 +255,7 @@ HANDLE GetPhysicalHandle(DWORD DriveIndex, BOOL bLockDrive, BOOL bWriteAccess, B
  * If PartitionOffset is 0, the offset is ignored and the first partition found is returned.
  * The returned string is allocated and must be freed.
  */
+#if !defined(__linux__)	// Linux version in linux/core/drive_linux.c
 char* GetLogicalName(DWORD DriveIndex, uint64_t PartitionOffset, BOOL bKeepTrailingBackslash, BOOL bSilent)
 {
 	static const char* ignore_device[] = { "\\Device\\CdRom", "\\Device\\Floppy" };
@@ -992,6 +1001,7 @@ out:
 	VDS_SET_ERROR(hr);
 	return (hr == S_OK);
 }
+#endif	/* !__linux__ */
 
 /* Wait for a logical drive to reappear - Used when a drive has just been repartitioned */
 BOOL WaitForLogical(DWORD DriveIndex, uint64_t PartitionOffset)
@@ -1054,6 +1064,7 @@ HANDLE AltGetLogicalHandle(DWORD DriveIndex, uint64_t PartitionOffset, BOOL bLoc
 	return hLogical;
 }
 
+#if !defined(__linux__)	// Linux version in linux/core/drive_linux.c
 /*
  * Who would have thought that Microsoft would make it so unbelievably hard to
  * get the frickin' device number for a drive? You have to use TWO different
@@ -1388,6 +1399,8 @@ BOOL GetDriveLabel(DWORD DriveIndex, char* letters, char** label, BOOL bSilent)
 /*
  * Return the drive size
  */
+#endif	/* !__linux__ */
+
 uint64_t GetDriveSize(DWORD DriveIndex)
 {
 	BOOL r;
@@ -2079,6 +2092,7 @@ BOOL GetDrivePartitionData(DWORD DriveIndex, char* FileSystemName, DWORD FileSys
 	return ret;
 }
 
+#if !defined(__linux__)	// Linux version in linux/core/drive_linux.c
 /*
  * Flush file data
  */
@@ -2277,6 +2291,8 @@ BOOL RemountVolume(char* drive_name, BOOL bSilent)
  * (especially IOCTL_DISK_UPDATE_PROPERTIES is *USELESS*), and therefore the OS will try to
  * read the file system data at an old location, even if the partition has just been deleted.
  */
+#endif	/* !__linux__ */
+
 static BOOL ClearPartition(HANDLE hDrive, uint64_t offset, DWORD size)
 {
 	BOOL r = FALSE;
@@ -2664,6 +2680,7 @@ const char* GetGPTPartitionType(const GUID* guid)
 /*
  * Detect Microsoft Dev Drives. See https://learn.microsoft.com/en-us/windows/dev-drive/.
  */
+#if !defined(__linux__)	// Linux version in linux/core/drive_linux.c
 BOOL IsMsDevDrive(DWORD DriveIndex)
 {
 	BOOL ret = FALSE;
@@ -2695,6 +2712,8 @@ out:
  * string GUIDs that match the GPT Disk GUID of the drive to filter out, as
  * reported by Rufus, such as "{F333EC2E-25C9-488D-A7FC-9147C2367623}".
  */
+#endif	/* !__linux__ */
+
 BOOL IsFilteredDrive(DWORD DriveIndex)
 {
 	char setting_name[32];

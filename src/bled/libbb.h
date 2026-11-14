@@ -16,8 +16,8 @@
 #ifndef LIBBB_H
 #define LIBBB_H 1
 
-#ifndef _WIN32
-#error Only Windows platforms are supported
+#if !defined(_WIN32) && !defined(__linux__)
+#error Only Windows and Linux platforms are supported
 #endif
 
 #include "platform.h"
@@ -58,7 +58,11 @@
 #define ENABLE_FEATURE_UNZIP_XZ         1
 #define ENABLE_FEATURE_CLEAN_UP         1
 #define uoff_t                          unsigned off_t
+#if defined(__linux__) && defined(__LP64__)
+#define OFF_FMT                         "l"
+#else
 #define OFF_FMT                         "ll"
+#endif
 
 #define SEAMLESS_COMPRESSION            0
 #if (SEAMLESS_COMPRESSION)
@@ -73,6 +77,7 @@
 #define IF_FEATURE_SEAMLESS_ZSTD(x)     x
 #endif
 
+#if !defined(__linux__)	// glibc provides these
 #ifndef _MODE_T_
 #define _MODE_T_
 typedef unsigned short mode_t;
@@ -92,6 +97,7 @@ typedef unsigned int gid_t;
 #define _UID_T_
 typedef unsigned int uid_t;
 #endif
+#endif	/* !__linux__ */
 
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -159,7 +165,12 @@ extern void (*bled_progress) (const int64_t processed_bytes);
 extern void (*bled_switch) (const char* filename, const uint64_t filesize);
 extern int (*bled_read)(int fd, void* buf, unsigned int count);
 extern int (*bled_write)(int fd, const void* buf, unsigned int count);
-extern unsigned long* bled_cancel_request;
+#if defined(__linux__)
+typedef uint32_t bled_cancel_t;
+#else
+typedef unsigned long bled_cancel_t;
+#endif
+extern bled_cancel_t* bled_cancel_request;
 
 #define xfunc_die() longjmp(bb_error_jmp, 1)
 #define bb_printf(...) do { if (bled_printf != NULL) bled_printf(__VA_ARGS__); \
@@ -185,13 +196,23 @@ static inline void *xrealloc(void *ptr, size_t size) {
 #define bb_msg_write_error "write error"
 #define bb_make_directory(path, mode, flags) SHCreateDirectoryExU(NULL, path, NULL)
 
+#if defined(__linux__)
+/* Same behaviour as on Windows: archive links, ownership and special files are not restored */
+#define link(oldpath, newpath) (errno = ENOSYS, -1)
+#define symlink(oldpath, newpath) (errno = ENOSYS, -1)
+#define chown(path, owner, group) (errno = ENOSYS, -1)
+#define mknod(pathname, mode, dev) (errno = ENOSYS, -1)
+#define fnmatch(pattern, string, flags) (PathMatchSpecA(string, pattern) ? 0 : 1)
+#define wait(status) (*(status) = 4, -1)
+#else
 static inline int link(const char *oldpath, const char *newpath) { errno = ENOSYS; return -1; }
 static inline int symlink(const char *oldpath, const char *newpath) { errno = ENOSYS; return -1; }
 static inline int chown(const char *path, uid_t owner, gid_t group) { errno = ENOSYS; return -1; }
 static inline int mknod(const char *pathname, mode_t mode, dev_t dev) { errno = ENOSYS; return -1; }
-static inline int utimes64(const char* filename, const struct timeval64 times64[2]) { errno = ENOSYS; return -1; }
 static inline int fnmatch(const char *pattern, const char *string, int flags) { return PathMatchSpecA(string, pattern) ? 0 : 1; }
 static inline pid_t wait(int* status) { *status = 4; return -1; }
+#endif
+static inline int utimes64(const char* filename, const struct timeval64 times64[2]) { errno = ENOSYS; return -1; }
 #define wait_any_nohang wait
 
 /* This enables the display of a progress based on the number of bytes read/written */
@@ -291,11 +312,13 @@ static inline void bb_copyfd_exact_size(int fd1, int fd2, off_t size)
 	_mm_free(buf);
 }
 
+#if !defined(__linux__)
 static inline struct tm *localtime_r(const time_t *timep, struct tm *result) {
 	if (localtime_s(result, timep) != 0)
 		result = NULL;
 	return result;
 }
+#endif
 
 #define safe_read full_read
 #define lstat stat
@@ -349,6 +372,7 @@ static inline void xmove_fd(int from, int to)
 #define O_EXCL  _O_EXCL
 #endif
 
+#if !defined(__linux__)
 /* MinGW doesn't know these */
 #define _S_IFLNK    0xA000
 #define _S_IFSOCK   0xC000
@@ -356,5 +380,6 @@ static inline void xmove_fd(int from, int to)
 #define S_IFSOCK    _S_IFSOCK
 #define S_ISLNK(m)  (((m) & _S_IFMT) == _S_IFLNK)
 #define S_ISSOCK(m) (((m) & _S_IFMT) == _S_IFSOCK)
+#endif
 
 #endif

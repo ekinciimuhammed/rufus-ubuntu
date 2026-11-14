@@ -214,7 +214,11 @@ static enum wimlib_progress_status WimProgressFunc(enum wimlib_progress_msg msg_
 	switch (msg_type) {
 	case WIMLIB_PROGRESS_MSG_EXTRACT_IMAGE_BEGIN:
 		memset(init, 0, sizeof(init));
+#if defined(__linux__)
+		uprintf("Applying image %d (\"%s\") from '%s' to '%s'",
+#else
 		uprintf("Applying image %d (\"%S\") from '%S' to '%S'",
+#endif
 			info->extract.image, info->extract.image_name,
 			info->extract.wimfile_name, info->extract.target);
 		break;
@@ -249,13 +253,21 @@ static enum wimlib_progress_status WimProgressFunc(enum wimlib_progress_msg msg_
 		break;
 	case WIMLIB_PROGRESS_MSG_SPLIT_BEGIN_PART:
 		last_split_progress = info->split;
+#if defined(__linux__)
+		uprintf("● %s", info->split.part_name);
+#else
 		uprintf("● %S", info->split.part_name);
+#endif
 		break;
 	case WIMLIB_PROGRESS_MSG_SPLIT_END_PART:
 		if (fd_md5sum != NULL) {
 			// Don't bother computing the hash at write time - just do it post creation
 			uint8_t sum[MD5_HASHSIZE];
+#if defined(__linux__)
+			char* filename = strdup(info->split.part_name);
+#else
 			char* filename = wchar_to_utf8(info->split.part_name);
+#endif
 			if (filename != NULL) {
 				HashFile(HASH_MD5, filename, sum);
 				for (int j = 0; j < MD5_HASHSIZE; j++)
@@ -383,6 +395,7 @@ BOOL WimApplyImage(const char* image, int index, const char* dst)
 
 // Mount an ISO or a VHD/VHDX image and provide its size
 // Returns the physical path of the mounted image or NULL on error.
+#if !defined(__linux__)	// See linux/core/vhd_linux.c for the Linux versions of these calls
 char* VhdMountImageAndGetSize(const char* path, uint64_t* disk_size)
 {
 	VIRTUAL_STORAGE_TYPE vtype = { VIRTUAL_STORAGE_TYPE_DEVICE_ISO, VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT };
@@ -588,6 +601,11 @@ static DWORD WINAPI FfuSaveImageThread(void* param)
 	safe_free(img_save->ImagePath);
 	ExitThread(r);
 }
+
+#else
+extern DWORD WINAPI VhdSaveImageThread(void* param);
+extern DWORD WINAPI FfuSaveImageThread(void* param);
+#endif	/* !__linux__ */
 
 BOOL SaveImage(void)
 {

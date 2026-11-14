@@ -20,6 +20,12 @@ typedef void (*progress_t) (const int64_t read_bytes);
 typedef int (*read_t)(int fd, void* buf, unsigned int count);
 typedef int (*write_t)(int fd, const void* buf, unsigned int count);
 typedef void (*switch_t)(const char* filename, const uint64_t size);
+#if defined(__linux__)
+/* Must match the width of Rufus' ErrorStatus (a 32-bit DWORD) */
+typedef uint32_t bled_cancel_t;
+#else
+typedef unsigned long bled_cancel_t;
+#endif
 
 typedef enum {
 	BLED_COMPRESSION_NONE = 0,
@@ -66,7 +72,7 @@ int64_t bled_uncompress_from_buffer_to_buffer(const char* src, const size_t src_
  * - point to an unsigned long variable, to be used to cancel operations when set to non zero
  */
 int bled_init(uint32_t buffer_size, printf_t print_function, read_t read_function, write_t write_function,
-    progress_t progress_function, switch_t switch_function, unsigned long* cancel_request);
+    progress_t progress_function, switch_t switch_function, bled_cancel_t* cancel_request);
 
 /* This call frees any resource used by the library */
 void bled_exit(void);

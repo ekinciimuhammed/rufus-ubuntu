@@ -1294,9 +1294,15 @@ BOOL ApplyWindowsCustomization(char drive_letter, int flags)
 				uprintf("Created 'HKLM\\SYSTEM\\Setup\\LabConfig\\%s' registry key", bypass_name[i]);
 			}
 			wuc[wuc_index].op = WIMLIB_UPDATE_OP_ADD;
+#if defined(__linux__)	// wimlib uses UTF-8 strings and '/' separators on UNIX
+			wuc[wuc_index].add.fs_source_path = linux_path(tmp_path[1]);
+			tmp_path[1][0] = '\0';
+			wuc[wuc_index].add.wim_target_path = "Windows/System32/config/SYSTEM";
+#else
 			wuc[wuc_index].add.fs_source_path = utf8_to_wchar(tmp_path[1]);
 			tmp_path[1][0] = '\0';
 			wuc[wuc_index].add.wim_target_path = L"Windows\\System32\\config\\SYSTEM";
+#endif
 			wuc_index++;
 
 			// We were successfull in creating the keys so remove this part from unattend.xml
@@ -1331,9 +1337,15 @@ BOOL ApplyWindowsCustomization(char drive_letter, int flags)
 			if_assert_fails(update_boot_wim)
 				goto out;
 			wuc[wuc_index].op = WIMLIB_UPDATE_OP_ADD;
+#if defined(__linux__)
+			wuc[wuc_index].add.fs_source_path = linux_path(unattend_xml_path);
+			wuc[wuc_index].add.wim_target_path = "Autounattend.xml";
+			uprintf("Added '%s' to '%s'", wuc[wuc_index].add.wim_target_path, boot_wim_path);
+#else
 			wuc[wuc_index].add.fs_source_path = utf8_to_wchar(unattend_xml_path);
 			wuc[wuc_index].add.wim_target_path = L"Autounattend.xml";
 			uprintf("Added '%S' to '%s'", wuc[wuc_index].add.wim_target_path, boot_wim_path);
+#endif
 			wuc_index++;
 		} else {
 			// If there is no windowsPE section in our unattend, then copying it as Autounattend.xml on

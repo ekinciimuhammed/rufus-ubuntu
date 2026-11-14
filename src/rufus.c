@@ -951,6 +951,7 @@ out:
 	return TRUE;
 }
 
+#if !defined(__linux__)	// The Linux user interface is in linux/ui
 // Callback for the log window
 BOOL CALLBACK LogCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1044,6 +1045,7 @@ BOOL CALLBACK LogCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
+#endif	/* !__linux__ */
 
 // Timer in the right part of the status area
 static void CALLBACK ClockTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
@@ -2055,6 +2057,7 @@ static __inline const char* IsAlphaOrBeta(void)
 #endif
 }
 
+#if !defined(__linux__)	// The Linux user interface is in linux/ui
 static void InitDialog(HWND hDlg)
 {
 	DWORD len;
@@ -4375,3 +4378,7 @@ static const IMAGE_LOAD_CONFIG_DIRECTORY32 _load_config __attribute__((aligned(1
 #endif
 #pragma GCC diagnostic pop
 #endif
+#else
+// Linux: GTK main window, message dispatching and program entry point
+#include "../linux/ui/rufus_main_linux.inc"
+#endif	/* !__linux__ */

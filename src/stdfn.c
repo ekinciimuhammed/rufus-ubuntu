@@ -324,6 +324,7 @@ const char* GetEditionName(DWORD ProductType)
 }
 
 PF_TYPE_DECL(WINAPI, HRESULT, WldpQueryWindowsLockdownMode, (PWLDP_WINDOWS_LOCKDOWN_MODE));
+#if !defined(__linux__)	// Linux version in linux/core/stdfn_linux.c
 BOOL isSMode(void)
 {
 	BOOL r = FALSE;
@@ -537,6 +538,8 @@ out:
 /*
  * String array manipulation
  */
+#endif	/* !__linux__ */
+
 void StrArrayCreate(StrArray* arr, uint32_t initial_size)
 {
 	if (arr == NULL) return;
@@ -608,6 +611,7 @@ void StrArrayDestroy(StrArray* arr)
 /*
  * Retrieve the SID of the current user. The returned PSID must be freed by the caller using LocalFree()
  */
+#if !defined(__linux__)	// Linux version in linux/core/stdfn_linux.c
 static PSID GetSID(void) {
 	TOKEN_USER* tu = NULL;
 	DWORD len;
@@ -918,6 +922,8 @@ out:
 	return ret;
 }
 
+#endif	/* !__linux__ */
+
 BOOL CompareGUID(const GUID *guid1, const GUID *guid2) {
 	if ((guid1 != NULL) && (guid2 != NULL)) {
 		return (memcmp(guid1, guid2, sizeof(GUID)) == 0);
@@ -925,6 +931,7 @@ BOOL CompareGUID(const GUID *guid1, const GUID *guid2) {
 	return FALSE;
 }
 
+#if !defined(__linux__)	// Linux version in linux/core/stdfn_linux.c
 static BOOL CALLBACK EnumFontFamExProc(const LOGFONTA *lpelfe,
 	const TEXTMETRICA *lpntme, DWORD FontType, LPARAM lParam)
 {
@@ -1000,6 +1007,8 @@ BOOL SetNDTA(BOOL bRestore, BOOL* bExistingKey, DWORD dwValue)
  * This call tries to evenly balance the affinities for an array of
  * num_threads, according to the number of cores at our disposal...
  */
+#endif	/* !__linux__ */
+
 BOOL SetThreadAffinity(DWORD_PTR* thread_affinity, size_t num_threads)
 {
 	size_t i, j, pc;
@@ -1035,6 +1044,7 @@ BOOL SetThreadAffinity(DWORD_PTR* thread_affinity, size_t num_threads)
  * 1. The OS supports UAC, UAC is on, and the current process runs elevated, or
  * 2. The OS doesn't support UAC or UAC is off, and the process is being run by a member of the admin group
  */
+#if !defined(__linux__)	// Linux version in linux/core/stdfn_linux.c
 BOOL IsCurrentProcessElevated(void)
 {
 	BOOL r = FALSE;
@@ -1238,3 +1248,4 @@ out:
 	safe_closehandle(hToken);
 	return ret;
 }
+#endif	/* !__linux__ */

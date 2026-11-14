@@ -79,6 +79,7 @@ extern char* archive_path;
 uint8_t *grub2_buf = NULL, *sec_buf = NULL;
 uint32_t grub2_len;
 
+#if !defined(__linux__)	// fmifs/VDS are Windows only
 /*
  * Convert the fmifs outputs messages (that use an OEM code page) to UTF-8
  */
@@ -260,6 +261,8 @@ static BOOLEAN __stdcall ChkdskCallback(FILE_SYSTEM_CALLBACK_COMMAND Command, DW
  * TODO: Use IVdsService::QueryFileSystemTypes -> VDS_FILE_SYSTEM_TYPE_PROP
  * to get the list of unauthorised and max length for each FS.
  */
+#endif	/* !__linux__ */
+
 static void ToValidLabel(char* Label, BOOL bFAT)
 {
 	size_t i, j, k;
@@ -333,6 +336,7 @@ static void ToValidLabel(char* Label, BOOL bFAT)
 /*
  * Call on VDS to format a partition
  */
+#if !defined(__linux__)	// fmifs/VDS are Windows only
 static BOOL FormatNativeVds(DWORD DriveIndex, uint64_t PartitionOffset, DWORD ClusterSize, LPCSTR FSName, LPCSTR Label, DWORD Flags)
 {
 	BOOL r = FALSE, bFoundVolume = FALSE;
@@ -661,6 +665,12 @@ out:
 	safe_free(wFSName);
 	return r;
 }
+#else
+/* Linux: formatting is performed with the mkfs utilities (see linux/core/format_linux.c) */
+extern BOOL FormatNativeLinux(DWORD DriveIndex, uint64_t PartitionOffset, DWORD ClusterSize, LPCSTR FSName, LPCSTR Label, DWORD Flags);
+#define FormatNative FormatNativeLinux
+#define FormatNativeVds FormatNativeLinux
+#endif	/* !__linux__ */
 
 BOOL FormatPartition(DWORD DriveIndex, uint64_t PartitionOffset, DWORD UnitAllocationSize, USHORT FSType, LPCSTR Label, DWORD Flags)
 {
@@ -680,6 +690,7 @@ BOOL FormatPartition(DWORD DriveIndex, uint64_t PartitionOffset, DWORD UnitAlloc
 		return FormatNative(DriveIndex, PartitionOffset, UnitAllocationSize, FileSystemLabel[FSType], Label, Flags);
 }
 
+#if !defined(__linux__)	// fmifs/VDS are Windows only
 /*
  * Call on fmifs.dll's Chkdsk() to fixup the filesystem
  */
@@ -714,6 +725,10 @@ static BOOL CheckDisk(char DriveLetter)
 out:
 	return r;
 }
+#else
+extern BOOL CheckDiskLinux(char DriveLetter);
+#define CheckDisk CheckDiskLinux
+#endif	/* !__linux__ */
 
 static BOOL ClearMBRGPT(HANDLE hPhysicalDrive, LONGLONG DiskSize, DWORD SectorSize)
 {

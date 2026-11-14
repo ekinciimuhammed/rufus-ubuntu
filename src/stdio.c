@@ -35,7 +35,10 @@
 #include <math.h>
 
 #include "rufus.h"
+#if !defined(__linux__)	// Linux version in linux/core/stdio_linux.c
 #include "ntdll.h"
+#endif	/* !__linux__ */
+
 #include "winio.h"
 #include "missing.h"
 #include "settings.h"
@@ -66,6 +69,7 @@ typedef struct {
 } debug_info_t;
 #pragma pack(pop)
 
+#if !defined(__linux__)	// Linux version in linux/core/stdio_linux.c
 void uprintf(const char *format, ...)
 {
 	static char buf[4096];
@@ -143,6 +147,8 @@ void uprintfs(const char* str)
 	}
 	free(wstr);
 }
+
+#endif	/* !__linux__ */
 
 void uprint_progress(uint64_t cur_value, uint64_t max_value)
 {
@@ -343,6 +349,7 @@ void DumpBufferHex(void *buf, size_t size)
 // Convert a Windows error to human readable string
 // One really has to wonder why the hell FormatMessage() was designed not to
 // handle FORMAT_MESSAGE_FROM_HMODULE automatically according to the facility...
+#if !defined(__linux__)	// Linux version in linux/core/stdio_linux.c
 const char *WindowsErrorString(void)
 {
 	static char err_string[256] = { 0 };
@@ -424,6 +431,8 @@ retry:
 	SetLastError(error_code);	// Make sure we don't change the errorcode on exit
 	return err_string;
 }
+
+#endif	/* !__linux__ */
 
 char* GuidToString(const GUID* guid, BOOL bDecorated)
 {
@@ -624,6 +633,7 @@ typedef struct
 	DWORD dwError;
 } cfx_params_t;
 
+#if !defined(__linux__)	// Linux version in linux/core/stdio_linux.c
 // Thread used by CreateFileWithTimeout() below
 DWORD WINAPI CreateFileWithTimeoutThread(void* params)
 {
@@ -684,6 +694,8 @@ HANDLE CreateFileWithTimeout(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwS
 }
 
 // A WriteFile() equivalent, with up to nNumRetries write attempts on error.
+#endif	/* !__linux__ */
+
 BOOL WriteFileWithRetry(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 	LPDWORD lpNumberOfBytesWritten, DWORD nNumRetries)
 {
@@ -729,6 +741,7 @@ BOOL WriteFileWithRetry(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWr
 	return FALSE;
 }
 
+#if !defined(__linux__)	// Linux version in linux/core/stdio_linux.c
 // A WaitForSingleObject() equivalent that doesn't block Windows messages
 // This is needed, for instance, if you are waiting for a thread that may issue uprintf's
 DWORD WaitForSingleObjectWithMessages(HANDLE hHandle, DWORD dwMilliseconds)
@@ -952,6 +965,8 @@ out:
 	pfSymCleanup(hRufus);
 	return r;
 }
+
+#endif	/* !__linux__ */
 
 static void print_extracted_file(const char* file_path, uint64_t file_length)
 {

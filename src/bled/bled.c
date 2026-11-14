@@ -23,7 +23,7 @@ read_t bled_read = NULL;
 write_t bled_write = NULL;
 progress_t bled_progress = NULL;
 switch_t bled_switch = NULL;
-unsigned long* bled_cancel_request;
+bled_cancel_t* bled_cancel_request;
 bool bled_initialized = 0;
 jmp_buf bb_error_jmp;
 char* bb_virtual_buf = NULL;
@@ -34,7 +34,7 @@ bool bb_progress_on_write = 0;
 // So we set our bufsize to 256 KB
 uint32_t BB_BUFSIZE = 0x40000;
 
-static int64_t unpack_none(transformer_state_t *xstate)
+static long long unpack_none(transformer_state_t *xstate)
 {
 	bb_error_msg("This compression type is not supported");
 	return -1;
@@ -341,7 +341,7 @@ err:
  * - point to an unsigned long variable, to be used to cancel operations when set to non zero
  */
 int bled_init(uint32_t buffer_size, printf_t print_function, read_t read_function, write_t write_function,
-	progress_t progress_function, switch_t switch_function, unsigned long* cancel_request)
+	progress_t progress_function, switch_t switch_function, bled_cancel_t* cancel_request)
 {
 	if (bled_initialized)
 		return -1;

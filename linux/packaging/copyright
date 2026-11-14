@@ -1,0 +1,50 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Rufus
+Upstream-Contact: Pete Batard <pete@akeo.ie>
+Source: https://github.com/pbatard/rufus
+
+Files: *
+Copyright: 2011-2026 Pete Batard <pete@akeo.ie>
+License: GPL-3+
+
+Files: linux/*
+Copyright: 2026 Rufus Linux port contributors
+License: GPL-3+
+
+Files: src/libcdio/*
+Copyright: 2000-2026 Rocky Bernstein, Herbert Valerio Riedel, Pete Batard and others
+License: GPL-3+
+
+Files: src/bled/*
+Copyright: 2014-2026 Pete Batard and the busybox authors
+License: GPL-2+
+
+Files: src/ms-sys/*
+Copyright: 2002-2009 Henrik Carlqvist, 2011-2026 Pete Batard
+License: GPL-2+
+
+Files: src/syslinux/*
+Copyright: 1998-2014 H. Peter Anvin and contributors
+License: GPL-2+
+
+Files: res/freedos/*
+Copyright: The FreeDOS project
+License: GPL-2+
+
+License: GPL-3+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 3 can be found in "/usr/share/common-licenses/GPL-3".
+
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 2 can be found in "/usr/share/common-licenses/GPL-2".

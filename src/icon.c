@@ -86,6 +86,7 @@ typedef struct
 
 #pragma pack(pop)
 
+#if !defined(__linux__)	// rebuilds the .ico from the PE resources
 /*
  * Extract the main icon set from the exe
  */
@@ -152,6 +153,24 @@ out:
 	safe_closehandle(hFile);
 	return r;
 }
+#else
+/*
+ * On Linux, rufus.ico is installed with the other data files, so we just copy it.
+ */
+BOOL ExtractAppIcon(const char* path, BOOL bSilent)
+{
+	DWORD len = 0;
+	uint8_t* icon = GetResource(hMainInstance, MAKEINTRESOURCEA(IDI_ICON), _RT_RCDATA, "icon", &len, FALSE);
+	if (icon == NULL || len == 0)
+		return FALSE;
+	if (write_file(path, icon, len) != len) {
+		uprintf("Unable to create icon '%s': %s.", path, WindowsErrorString());
+		return FALSE;
+	}
+	suprintf("Created: %s", path);
+	return TRUE;
+}
+#endif	/* !__linux__ */
 
 /*
  * Create an autorun.inf, if none exists

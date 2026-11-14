@@ -1885,6 +1885,10 @@ out:
 /*
  * Hash dialog callback
  */
+#if defined(__linux__)
+/* The hash results dialog is implemented by the GTK front-end */
+extern void ShowHashDialog(void);
+#else
 INT_PTR CALLBACK HashCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HFONT hFont = NULL;
@@ -1961,6 +1965,7 @@ INT_PTR CALLBACK HashCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 	}
 	return (INT_PTR)FALSE;
 }
+#endif
 
 /* Individual thread that computes one of MD5, SHA1, SHA256 or SHA512 in parallel */
 DWORD WINAPI IndividualHashThread(void* param)
@@ -2127,7 +2132,11 @@ out:
 	CloseFileAsync(fd);
 	PostMessage(hMainDialog, UM_FORMAT_COMPLETED, (WPARAM)FALSE, 0);
 	if (r == 0)
+#if defined(__linux__)
+		ShowHashDialog();
+#else
 		MyDialogBox(hMainInstance, IDD_HASH, hMainDialog, HashCallback);
+#endif
 	ExitThread(r);
 }
 

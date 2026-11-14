@@ -254,7 +254,8 @@ typedef struct transformer_state_t {
 	} magic;
 } transformer_state_t;
 
-typedef int64_t(*unpacker_t)(transformer_state_t* xstate);
+/* NB: 'long long' rather than int64_t, to match the unpackers' declarations on LP64 platforms */
+typedef long long(*unpacker_t)(transformer_state_t* xstate);
 typedef int64_t(*get_uncompressed_size_t)(int fd);
 int64_t get_uncompressed_size(int fd, int type);
 void init_transformer_state(transformer_state_t *xstate) FAST_FUNC;

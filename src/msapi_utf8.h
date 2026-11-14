@@ -22,6 +22,10 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#if defined(__linux__)
+// Linux builds use a native UTF-8 implementation of these helpers
+#include "../linux/include/msapi_utf8_linux.h"
+#else
 #include <windows.h>
 #include <stdio.h>
 #include <shlobj.h>
@@ -1461,3 +1465,5 @@ static __inline BOOL GetVolumeNameForVolumeMountPointU(LPCSTR lpszVolumeMountPoi
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* __linux__ */

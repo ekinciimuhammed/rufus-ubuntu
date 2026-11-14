@@ -1,0 +1,4 @@
+# Build output (binaries, sysroot, .deb, test ISOs and logs)
+build/
+# The top-level .gitignore ignores every Makefile; keep this one
+!Makefile

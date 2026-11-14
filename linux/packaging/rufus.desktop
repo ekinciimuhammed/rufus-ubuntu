@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Rufus
+GenericName=Bootable USB Creator
+GenericName[tr]=Önyüklenebilir USB Oluşturucu
+Comment=Format and create bootable USB flash drives
+Comment[tr]=USB bellekleri biçimlendirin ve önyüklenebilir USB sürücüler oluşturun
+Exec=rufus %f
+Icon=rufus
+Terminal=false
+Categories=System;Filesystem;
+Keywords=USB;bootable;ISO;format;flash;drive;
+Keywords[tr]=USB;önyüklenebilir;ISO;biçimlendir;bellek;sürücü;
+MimeType=application/x-cd-image;application/x-iso9660-image;application/x-raw-disk-image;application/vnd.efi.img;application/x-xz-compressed-raw-disk-image;
+StartupNotify=true
